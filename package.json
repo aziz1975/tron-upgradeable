@@ -2,6 +2,7 @@
   "name": "tron-upgradeable",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +13,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^5.1.0",
     "@openzeppelin/contracts-upgradeable": "^5.1.0",
-    "tronbox": "^4.0.2"
+    "tronbox": "^4.0.2",
+    "tronweb": "^6.0.0"
   }
 }

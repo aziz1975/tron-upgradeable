@@ -8,18 +8,23 @@ module.exports = {
         network_id: '*',
       },
       development: {
-        privateKey: '9b9902297149a8e7939b2b5acfc7c8095102ddd04fa96657d19cc853020e6020',
+        privateKey: '7d62b54ad1b154a74570cf4d928324335365d70265fd8e6eb72d22738b85f559',
         consume_user_resource_percent: 100,
         fee_limit: 1000000000,
         fullHost: 'http://127.0.0.1:9090', 
         network_id: '*'
       },
     },
-    solc: {
-        optimizer: {
-          enabled: true,
-          runs: 200,
+    compilers: {
+      solc: {
+        version: "0.8.20",
+        settings: {
+          optimizer: {
+            enabled: true, // Optional optimization settings
+            runs: 200,
+          },
         },
+      },
     },
   };
   

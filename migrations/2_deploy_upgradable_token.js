@@ -26,14 +26,13 @@ module.exports = async function (deployer, network, accounts) {
 
   // 4) Initialize ImplementationV1 via proxy
   const proxiedV1 = await ImplementationV1.at(proxy.address);
-  // No { from: ... }
   await proxiedV1.initialize("Hello Tron!", "HTR", 1000);
   console.log("Initialized V1 via proxy.");
 
   // 5) Deploy V2
-  //await deployer.deploy(ImplementationV2);
-  //const implV2 = await ImplementationV2.deployed();
-  //console.log("ImplementationV2 deployed at:", implV2.address);
+  await deployer.deploy(ImplementationV2);
+  const implV2 = await ImplementationV2.deployed();
+  console.log("ImplementationV2 deployed at:", implV2.address);
 
   // 6) Upgrade
   //await proxyAdmin.upgrade(proxy.address, implV2.address);
