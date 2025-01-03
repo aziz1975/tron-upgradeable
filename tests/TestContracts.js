@@ -1,5 +1,5 @@
 /**
- * testUpgradeSequence.mjs
+ * TestContracts.js
  *
  * A single script that:
  *  1) Connects to a local Tron node (or Nile, if you change config).
@@ -22,20 +22,20 @@
  *  3) "npx tronbox compile --network development"
  *  4) "npx tronbox migrate --network development"
  *  5) Update the addresses below from the migration logs.
- *  6) "node testUpgradeSequence.mjs"
+ *  6) "node TestContracts.js"
  */
 
 import { TronWeb } from 'tronweb';
 
 // For Node >=16 with "type":"module" in package.json, you can import JSON like this:
-import ImplementationV1Artifact from './build/contracts/ImplementationV1.json' assert { type: 'json' };
-import ImplementationV2Artifact from './build/contracts/ImplementationV2.json' assert { type: 'json' };
-import ProxyAdminArtifact from './build/contracts/ProxyAdmin.json' assert { type: 'json' };
-import TransparentUpgradeableProxyArtifact from './build/contracts/TransparentUpgradeableProxy.json' assert { type: 'json' };
+import ImplementationV1Artifact from '../build/contracts/ImplementationV1.json' assert { type: 'json' };
+import ImplementationV2Artifact from '../build/contracts/ImplementationV2.json' assert { type: 'json' };
+import ProxyAdminArtifact from '../build/contracts/ProxyAdmin.json' assert { type: 'json' };
+import TransparentUpgradeableProxyArtifact from '../build/contracts/TransparentUpgradeableProxy.json' assert { type: 'json' };
 
 // 1) Configure TronWeb
 //    Replace PRIVATE_KEY with the same one you used for local deployment.
-const PRIVATE_KEY = "7d62b54ad1b154a74570cf4d928324335365d70265fd8e6eb72d22738b85f559"; // from tronbox.js
+const PRIVATE_KEY = "5e39b89d49a5470b68ef628c73fe8de7dce539571951b9b187ba17a9afe4c445"; // from tronbox.js
 const FULL_NODE = "http://127.0.0.1:9090";
 
 const tronWeb = new TronWeb({
@@ -44,13 +44,13 @@ const tronWeb = new TronWeb({
 });
 
 // 2) Addresses from your migration logs
-const proxyAdminAddress = "TSLwW7tb7Hpb9mdPAq4hKtqBbDsJ4DBEd6";
-const implementationV1Address = "TL1a6Mr6jVNZqYav9wayHRTq9gcyU5Xmid";
-const implementationV2Address = "TM4NWSCodjuoGP83br2yYKcWBkvukZAz2Z";
-const proxyAddress = "TAHLRfPejpmoyEJ6o3gAmVsDxMLNvfhib4"; // The actual token (TransparentUpgradeableProxy)
+const proxyAdminAddress = "TBo9pcHUgBVjKreghDAJ2Yxje4V6XTKvc4";
+const implementationV1Address = "TYPV6f9amKNjPzEZmFFwqeaHYCERLEBSbz";
+const implementationV2Address = "TW7QKFnYDjaHRoWmbHvyBh2L8ieGuaGCJk";
+const proxyAddress = "TU9UQeC6ChiPtFT1yom3Sx2mrN7KFDtGhY"; // The actual token (TransparentUpgradeableProxy)
 
 // We'll define a new owner for ProxyAdmin ownership transfer:
-const NEW_OWNER_PRIVATE_KEY = "8116f3fe30317da10cef0451b1c407201adf6c0f6751fc470572d4b31587b9e2";
+const NEW_OWNER_PRIVATE_KEY = "95dba62ced1fee9929346bfb91cb3a01bdd28afe609dc8b6ccbbc1c0c642ae32";
 let newOwnerBase58 = "";
 
 async function main() {
@@ -177,5 +177,5 @@ async function main() {
 
 // Execute main
 main()
-  .then(() => console.log("\nFinished testUpgradeSequence.mjs successfully"))
-  .catch((err) => console.error("Error in testUpgradeSequence.mjs:", err));
+  .then(() => console.log("\nFinished TestContracts.js successfully"))
+  .catch((err) => console.error("Error in TestContracts.js:", err));
