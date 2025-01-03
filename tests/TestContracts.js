@@ -1,28 +1,16 @@
 /**
  * TestContracts.js
  *
- * A single script that:
- *  1) Connects to a local Tron node (or Nile, if you change config).
- *  2) Loads artifacts for:
- *       - ImplementationV1
- *       - ImplementationV2
- *       - ProxyAdmin
- *       - TransparentUpgradeableProxy
- *  3) Demonstrates direct calls to ImplementationV1/ImplementationV2 addresses
- *      (usually uninitialized if you never called `initialize` on them).
- *  4) Interacts with the proxy as V1 (transfers, sets someValue, etc.).
- *  5) Uses ProxyAdmin to upgrade the proxy from V1 -> V2.
- *  6) Interacts with the proxy as V2 (initializeV2, setNewValue, etc.).
- *  7) Transfers ownership of the ProxyAdmin to a new address
- *     and demonstrates the new owner can still upgrade.
+ * Demonstrates:
+ *  1) Direct calls to ImplementationV1/ImplementationV2
+ *  2) Interacting with the proxy as V1
+ *  3) Upgrading to V2
+ *  4) Interacting with the proxy as V2
+ *  5) Transfer ownership of ProxyAdmin
+ *  6) Demonstrate the new owner can still upgrade
  *
- * To run:
- *  1) Edit your package.json to have: "type": "module"
- *  2) "npm install tronweb"
- *  3) "npx tronbox compile --network development"
- *  4) "npx tronbox migrate --network development"
- *  5) Update the addresses below from the migration logs.
- *  6) "node TestContracts.js"
+ * This version is updated for ImplementationV1 having:
+ *    function initialize(string memory, string memory, uint256, address) external initializer
  */
 
 import { TronWeb } from 'tronweb';
@@ -34,8 +22,8 @@ import ProxyAdminArtifact from '../build/contracts/ProxyAdmin.json' assert { typ
 import TransparentUpgradeableProxyArtifact from '../build/contracts/TransparentUpgradeableProxy.json' assert { type: 'json' };
 
 // 1) Configure TronWeb
-//    Replace PRIVATE_KEY with the same one you used for local deployment.
-const PRIVATE_KEY = "5e39b89d49a5470b68ef628c73fe8de7dce539571951b9b187ba17a9afe4c445"; // from tronbox.js
+//    Replace PRIVATE_KEY with the same one used for local deployment.
+const PRIVATE_KEY = "bbd1ff759128a5729fd24ec1ad3d1a60f644d087c01b4a8edc337522d6eb3e75"; 
 const FULL_NODE = "http://127.0.0.1:9090";
 
 const tronWeb = new TronWeb({
@@ -43,26 +31,29 @@ const tronWeb = new TronWeb({
   privateKey: PRIVATE_KEY,
 });
 
-// 2) Addresses from your migration logs
-const proxyAdminAddress = "TBo9pcHUgBVjKreghDAJ2Yxje4V6XTKvc4";
-const implementationV1Address = "TYPV6f9amKNjPzEZmFFwqeaHYCERLEBSbz";
-const implementationV2Address = "TW7QKFnYDjaHRoWmbHvyBh2L8ieGuaGCJk";
-const proxyAddress = "TU9UQeC6ChiPtFT1yom3Sx2mrN7KFDtGhY"; // The actual token (TransparentUpgradeableProxy)
-
 // We'll define a new owner for ProxyAdmin ownership transfer:
-const NEW_OWNER_PRIVATE_KEY = "95dba62ced1fee9929346bfb91cb3a01bdd28afe609dc8b6ccbbc1c0c642ae32";
+const NEW_OWNER_PRIVATE_KEY = "443dcf76d1a921d10f7eac3a9dc3eb11485312771a74730f0f44bf64ff1fd4a9";
 let newOwnerBase58 = "";
+
+// 2) Addresses from your deployment logs
+//    Update these as needed from the actual deployment output.
+const proxyAdminAddress = "TKJS9VYnAcdGHwiKZ6LCzwPfjpHZ3zR5BT";
+const implementationV1Address = "TYWPwUaVLYkj1T1NcWxqSQEFcFWAbFxNPb";
+const implementationV2Address = "TLXDtHjBHjX2NVm4V7WwXQ7Jxh9w7AZNvq";
+const proxyAddress = "TDNxS3qPr2jDqWGHCDG6tQZi6puxP6F893";
 
 async function main() {
   console.log("=== Starting testUpgradeSequence ===\n");
 
-  // Derive the base58 address from the new owner's private key
+  // Derive addresses from private keys
+  const deployerBase58 = tronWeb.address.fromPrivateKey(PRIVATE_KEY);
   newOwnerBase58 = tronWeb.address.fromPrivateKey(NEW_OWNER_PRIVATE_KEY);
+
+  console.log("Deployer address (base58):", deployerBase58);
   console.log("New owner address (base58):", newOwnerBase58);
 
   // -----------------------------------------------------------
   // A) Direct calls to ImplementationV1 and ImplementationV2
-  //    (In an upgradeable scenario, these are typically unused.)
   // -----------------------------------------------------------
   console.log("\n--- Directly reading ImplementationV1 at", implementationV1Address, "---");
   const directImplV1 = await tronWeb.contract(ImplementationV1Artifact.abi, implementationV1Address);
@@ -93,6 +84,7 @@ async function main() {
   const proxiedV1 = await tronWeb.contract(ImplementationV1Artifact.abi, proxyAddress);
 
   console.log("Reading V1 name/symbol/totalSupply via proxy...");
+  // name(), symbol(), totalSupply() come from ERC20
   const v1Name = await proxiedV1.name().call();
   const v1Symbol = await proxiedV1.symbol().call();
   const v1Supply = await proxiedV1.totalSupply().call();
@@ -100,21 +92,26 @@ async function main() {
   console.log("V1 symbol:", v1Symbol);
   console.log("V1 totalSupply:", v1Supply.toString());
 
-  // setSomeValue(...)
+  // Check owner
+  const actualOwnerHex = await proxiedV1.owner().call();
+  const actualOwnerBase58 = tronWeb.address.fromHex(actualOwnerHex);
+  console.log("V1 Contract owner (via proxy):", actualOwnerBase58);
+
+  // Read & set someValue
   console.log("Current someValue (V1):", (await proxiedV1.getSomeValue().call()).toString());
   console.log("Setting someValue to 123...");
   await proxiedV1.setSomeValue(123).send();
   console.log("New someValue:", (await proxiedV1.getSomeValue().call()).toString());
 
   // Transfer tokens
-  const recipient = "TGTPykpkMhG2ddSVcGRodioRvonPuxyP95";
-  console.log(`Transferring 50 tokens to ${recipient} (via proxy, still V1)...`);
+  const recipient = "TWpLKxV6PgK6CN2YZJATkHWT39Q5djSqf3";
+  console.log(`Transferring 50 tokens to ${recipient}...`);
   await proxiedV1.transfer(recipient, 50).send();
   const recipBalance = await proxiedV1.balanceOf(recipient).call();
   console.log("Recipient balance:", recipBalance.toString());
 
   // -----------------------------------------------------------
-  // C) Upgrade from V1 to V2 via ProxyAdmin
+  // C) Upgrade to V2 via ProxyAdmin
   // -----------------------------------------------------------
   console.log("\n--- Upgrading to V2 ---");
   const proxyAdmin = await tronWeb.contract(ProxyAdminArtifact.abi, proxyAdminAddress);
@@ -122,7 +119,7 @@ async function main() {
   console.log("Proxy upgraded to V2.");
 
   // -----------------------------------------------------------
-  // D) Interact with V2
+  // D) Interact with the Proxy as V2
   // -----------------------------------------------------------
   console.log("\n--- Interacting with the Proxy as V2 ---");
   const proxiedV2 = await tronWeb.contract(ImplementationV2Artifact.abi, proxyAddress);
@@ -131,7 +128,6 @@ async function main() {
   await proxiedV2.initializeV2().send();
   console.log("Called initializeV2().");
 
-  // setNewValue(...)
   console.log("Setting newValue to 999 in V2...");
   await proxiedV2.setNewValue(999).send();
   const newValue = await proxiedV2.getNewValue().call();
@@ -158,7 +154,6 @@ async function main() {
   // F) Demonstrate new owner can still upgrade
   // -----------------------------------------------------------
   console.log("\n--- Demonstrate new owner usage ---");
-  // Create a TronWeb instance for new owner
   const tronWebNewOwner = new TronWeb({
     fullHost: FULL_NODE,
     privateKey: NEW_OWNER_PRIVATE_KEY,
@@ -167,8 +162,8 @@ async function main() {
   // New owner's ProxyAdmin instance
   const proxyAdminNewOwner = await tronWebNewOwner.contract(ProxyAdminArtifact.abi, proxyAdminAddress);
 
-  // We'll just re-upgrade to V2 again as a no-op, to prove it works
-  console.log("New owner upgrading to V2 again (redundant, but proves the point)...");
+  // We'll just re-upgrade to V2 again (no-op) to prove the new owner can do it
+  console.log("New owner upgrading to V2 again (redundant, but a proof of ownership)...");
   await proxyAdminNewOwner.upgrade(proxyAddress, implementationV2Address).send();
   console.log("Upgrade from new owner succeeded.");
 

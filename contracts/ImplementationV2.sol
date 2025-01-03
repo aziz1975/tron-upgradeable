@@ -1,36 +1,33 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-
 /**
- * @title ImplementationV2
- * @dev Upgraded version with additional state & logic,
- *      must preserve the same storage layout from V1 at the top.
+ * ImplementationV2 using the new OwnableUpgradeable (v5).
+ * We preserve the same storage layout as V1 at the top, 
+ * and we typically do NOT re-init Ownable again unless we want to set a new owner.
  */
-contract ImplementationV2 is ERC20, Ownable {
-    // == Copy V1's storage in the same order/placement ==
+
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+contract ImplementationV2 is Initializable, ERC20Upgradeable, OwnableUpgradeable {
+    // == Copy V1's storage in the same exact order ==
     string private _tokenName;
     string private _tokenSymbol;
     uint256 private _someValue;
-    bool private _initialized;  // from V1
+    bool private _initialized; // from V1
 
-    // == NEW STORAGE for V2 goes after existing variables ==
+    // == New storage for V2 goes next ==
     uint256 private _newValue;
     bool private _initializedV2;
 
     /**
-     * @dev Older-style Ownable that requires a parameter: Ownable(msg.sender).
+     * @dev Initialization entrypoint for V2. 
+     *      We do NOT call __Ownable_init again, as it would override the current owner.
+     *      The owner is carried forward from V1's storage.
      */
-    constructor() ERC20("", "") Ownable(msg.sender) {
-        // Typically unused in an upgradeable scenario.
-    }
-
-    /**
-     * @dev Set up new fields post-upgrade.
-     */
-    function initializeV2() external {
+    function initializeV2() external reinitializer(2) {
         require(!_initializedV2, "ImplementationV2: Already initialized");
         _initializedV2 = true;
 
@@ -38,7 +35,8 @@ contract ImplementationV2 is ERC20, Ownable {
         _newValue = 777;
     }
 
-    // Override name & symbol from ERC20
+    // =========== Overridden ERC20 name & symbol ===========
+
     function name() public view virtual override returns (string memory) {
         return _tokenName;
     }
@@ -57,7 +55,7 @@ contract ImplementationV2 is ERC20, Ownable {
         _someValue = newVal;
     }
 
-    // =========== NEW LOGIC in V2 ===========
+    // =========== New V2 Logic ===========
 
     function getNewValue() external view returns (uint256) {
         return _newValue;
