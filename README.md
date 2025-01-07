@@ -53,6 +53,16 @@ This project showcases a minimal transparent upgradeable proxy setup on the Tron
 
 ## Setup and Installation
 
+**Using Docker for Local Development and Testing:** \
+Pull the Docker Image (do this only once):
+   ```bash
+   docker pull tronbox/tre
+   ```
+Run the Container:
+   ```bash
+   docker run -it -p 9090:9090 --rm --name tron tronbox/tre
+```
+
 **Clone the Repository:** 
    ```bash
    git clone https://github.com/aziz1975/tron-upgradeable.git
