@@ -69,7 +69,7 @@ Run the Container:
    cd tron-upgradeable
    npm install
    ```
-Please rename the .env.sample file to .env. Update the .env file with your private key, Tron node host, and deployed contract addresses etc so they are properly used by tronbox.js, 2_deploy_upgradable_token.js, and TestContracts.js.
+**Important Note:** Please rename the .env.sample file to .env. Update the .env file with your private key, Tron node host, and deployed contract addresses etc so they are properly used by tronbox.js, 2_deploy_upgradable_token.js, and TestContracts.js.
 
 **Compile and Deploy:**  
    ```bash
@@ -91,6 +91,8 @@ Copy those addresses and update the .env file accordingly. \
    npm install
    node TestContracts.js
 ```
+**Important Note:** It's recommended not to run the whole test suite at once in the Nile or Shasta environment. Doing so can generate inconsistent outputs and unnecessarily consume resources. Run only the sections of code you actually need to test.
+
 ## Notes on Storage Layout 
 When using upgradeable contracts, storage layout must remain consistent across versions to avoid corrupting stored data. In ImplementationV2, the original state variables from ImplementationV1 appear in the same order at the top.
 
