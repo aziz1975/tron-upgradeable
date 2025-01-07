@@ -71,11 +71,11 @@ After deployment, you will see addresses of the deployed contracts:
 1. ProxyAdmin at some Tron address
 2. ImplementationV1 at some Tron address
 3. TransparentUpgradeableProxy at some Tron address
-4. ImplementationV2 at some Tron address \
+4. ImplementationV2 at some Tron address
 
-Copy those addresses and update the .env file accordingly.
+Copy those addresses and update the .env file accordingly. \
 **Test Script:** \
- Test script is under tests folder.
+ The test script is located in the tests folder.
  ```bash
    cd tests
    npm install
