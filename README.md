@@ -59,7 +59,7 @@ This project showcases a minimal transparent upgradeable proxy setup on the Tron
    cd tron-upgradeable
    npm install
    ```
-Update the .env file with your private key, Tron node host, and deployed contract addresses etc so they are properly used by tronbox.js, 2_deploy_upgradable_token.js, and TestContracts.js.
+Please rename the .env.sample file to .env. Update the .env file with your private key, Tron node host, and deployed contract addresses etc so they are properly used by tronbox.js, 2_deploy_upgradable_token.js, and TestContracts.js.
 
 **Compile and Deploy:**  
    ```bash
