@@ -5,7 +5,7 @@ const ImplementationV1 = artifacts.require("ImplementationV1");
 const ImplementationV2 = artifacts.require("ImplementationV2");
 
 // 1) Import TronWeb locally (not from a global TronBox variable).
-const {TronWeb} = require("tronweb");
+const { TronWeb } = require("tronweb");
 
 module.exports = async function (deployer, network, accounts) {
   // --------------------------------------------------------------------------
@@ -13,8 +13,9 @@ module.exports = async function (deployer, network, accounts) {
   //    For demonstration, we hardcode it here. 
   //    In production or CI, you can read from an env var: process.env.PRIVATE_KEY
   // --------------------------------------------------------------------------
-  const PRIVATE_KEY = process.env.PRIVATE_KEY_DEVELOPMENT; // same as tronbox.js. Coming from .env file
-  const FULL_NODE = process.env.FULL_NODE_DEVELOPMENT; // the node you’re using. Coming from .env file
+  const PRIVATE_KEY = process.env.PRIVATE_KEY_DEVELOPMENT; // This constant is used to generate the initial owner address only, change this to different Private Keys as needed depending on your network
+  const FULL_NODE = process.env.FULL_NODE_DEVELOPMENT; // the node you’re using. Coming from .env file, change this to different Private Keys as needed depending on your network.
+
 
   const localTronWeb = new TronWeb({
     fullHost: FULL_NODE,
@@ -55,23 +56,23 @@ module.exports = async function (deployer, network, accounts) {
   // --------------------------------------------------------------------------
   const proxiedV1 = await ImplementationV1.at(proxy.address);
   await proxiedV1.initialize(
-    "Aziz Tron!",  // name
-    "AUA",          // symbol
-    1000,           // initialSupply
+    "NEW Proxy Token!",  // name
+    "NEW",          // symbol
+    888,           // initialSupply
     deployerBase58  // initialOwner
   );
   console.log("Initialized V1 via proxy. Owner set to:", deployerBase58);
 
   // --------------------------------------------------------------------------
-  // F) Deploy ImplementationV2
+  // F) Deploy ImplementationV2 --> Uncomment when a new implementation is needed
   // --------------------------------------------------------------------------
-  await deployer.deploy(ImplementationV2);
-  const implV2 = await ImplementationV2.deployed();
-  console.log("ImplementationV2 deployed at:", implV2.address);
+  //await deployer.deploy(ImplementationV2);
+  //const implV2 = await ImplementationV2.deployed();
+  //console.log("ImplementationV2 deployed at:", implV2.address);
 
   // --------------------------------------------------------------------------
-  // G) (Optional) Immediately upgrade to V2
+  // G) (Optional) Immediately upgrade to V2 --> Uncomment when a new implementation is needed
   // --------------------------------------------------------------------------
-  // await proxyAdmin.upgrade(proxy.address, implV2.address);
-  // console.log("Proxy upgraded to V2");
+  //await proxyAdmin.upgrade(proxy.address, implV2.address);
+  //console.log("Proxy upgraded to V2");
 };
