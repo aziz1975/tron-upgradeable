@@ -83,7 +83,7 @@ cp .env.sample .env
 
 Before compiling & deploying, a few updates need to be done:
 
-1. Modify your PRIVATE_KEY & FULL_NODE constants depending on your  network preferences. B
+1. Modify your PRIVATE_KEY & FULL_NODE constants depending on your  network preferences.
 2. Modify the 2_deploy_upgradable_token.js script with your own token information (line 56)
 3. Make sure to run steps A to E form the 2_deploy_upgradable_token.js  when deploying your contract for the first time (Comment code as needed)
 4. When upgrading implementation contract make sure to run ONLY steps F & G (optionally if you want to upgrade after deploying v2,v3, etc, Comment code as needed)
